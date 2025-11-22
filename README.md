@@ -1,0 +1,2 @@
+# Intelligent-Quiz-Management-System-with-Auto--Generated-Questions
+AI-Powered Quiz Hub is a Python-based intelligent quiz application that lets users explore and attempt quizzes across multiple categories such as Academic, Entertainment, and General Knowledge. Each category dynamically reveals relevant subcategories (e.g., Physics, Chemistry, Sports, etc.), allowing users to choose their preferred topic.
