@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-purple-600 p-4">
+
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 mb-4">
+
+    <!-- Profile Avatar -->
+    {% if profile.avatar %}
+      <img src="{{ profile.avatar.url }}" alt="Profile Picture" class="w-32 h-32 rounded-full border-4 border-blue-500 object-cover mx-auto mb-4">
+    {% else %}
+      <img src="{% static 'avatars/default.png' %}" alt="Default Profile Picture" class="w-32 h-32 rounded-full border-4 border-blue-500 object-cover mx-auto mb-4">
+    {% endif %}
+
+    <!-- View Mode -->
+    <div id="view-mode" class="text-center space-y-2">
+      <h2 class="text-2xl font-bold text-gray-800">{{ user.username }}</h2>
+      <p class="text-gray-600">Email: {{ user.email }}</p>
+      <p class="text-gray-600">Age: {{ profile.age }}</p>
+      <button type="button"
+              class="mt-4 px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium shadow hover:bg-blue-700 transition transform hover:scale-105"
+              onclick="toggleEdit()">
+        Edit
+      </button>
+    </div>
+
+    <!-- Edit Mode -->
+    <form id="edit-mode" action="{% url 'profile' %}" method="POST" enctype="multipart/form-data" class="hidden space-y-4 mt-4">
+      {% csrf_token %}
+      <input type="text" name="username" value="{{ user.username }}" placeholder="Username"
+             class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <input type="email" name="email" value="{{ user.email }}" placeholder="Email"
+             class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <input type="number" name="age" value="{{ profile.age }}" placeholder="Age"
+             class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <input type="file" name="profile_image" accept="image/*"
+             class="w-full text-gray-600">
+
+      <div class="flex justify-between mt-4">
+        <button type="submit"
+                class="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium shadow hover:bg-green-600 transition transform hover:scale-105">
+          Save
+        </button>
+        <button type="button" onclick="cancelEdit()"
+                class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium shadow hover:bg-red-600 transition transform hover:scale-105">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Back to Home Link -->
+  <a href="{% url 'home' %}" class="text-white hover:underline text-sm mt-2">
+    ← Back to Home
+  </a>
+
+  <script>
+    function toggleEdit() {
+      document.getElementById("view-mode").classList.add("hidden");
+      document.getElementById("edit-mode").classList.remove("hidden");
+    }
+
+    function cancelEdit() {
+      document.getElementById("edit-mode").classList.add("hidden");
+      document.getElementById("view-mode").classList.remove("hidden");
+    }
+  </script>
+
+</body>
+</html>

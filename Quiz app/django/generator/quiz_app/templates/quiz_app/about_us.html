@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Us - Quiz App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Header -->
+  <header class="bg-blue-600 text-white py-4 px-6 flex justify-between items-center shadow-md">
+    <h1 class="text-2xl font-bold tracking-wide">Quiz App</h1>
+    <nav class="space-x-6 text-sm font-semibold">
+      <a href="{% url 'home' %}" class="hover:underline">Home</a>
+      <a href="{% url 'dashboard' %}" class="hover:underline">Dashboard</a>
+      <a href="{% url 'about_us' %}" class="hover:underline">About Us</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-blue-600 text-white py-20">
+    <div class="max-w-4xl mx-auto text-center px-6">
+      <h1 class="text-5xl font-bold mb-4">About Us</h1>
+      <p class="text-lg leading-relaxed">
+        Welcome to <strong>Infosys Springboard</strong>! We are dedicated to empowering learners and fostering innovation through technology.
+      </p>
+    </div>
+  </section>
+
+  <!-- Company Info -->
+  <section class="py-16">
+    <div class="max-w-4xl mx-auto text-center px-6">
+      <h2 class="text-3xl font-bold mb-6 text-gray-800">Company Information</h2>
+      <p class="text-gray-600 mb-3">Company: <strong>Infosys Springboard (an initiative of Infosys)</strong></p>
+      <p class="text-gray-600 mb-3">Founder of Infosys: <strong>N. R. Narayana Murthy</strong></p>
+      <p class="text-gray-600 mb-3">CEO of Infosys: <strong>Salil Parekh</strong></p>
+
+      <h2 class="text-3xl font-bold mt-10 mb-4 text-gray-800">Project Overview</h2>
+      <p class="text-gray-600 mb-3"><strong>Project Title:</strong> Intelligent Quiz Management System with Auto-Generated Questions</p>
+      <p class="text-gray-600 mb-3"><strong>Technology Stack:</strong> Python</p>
+      <p class="text-gray-600 mb-3 leading-relaxed">
+        <strong>About the Quiz:</strong> Our AI-powered platform dynamically generates quiz questions across diverse categories like Academics, Entertainment, and General Knowledge. 
+        Users can take quizzes, view performance analytics, and track their progress interactively.
+      </p>
+      <p class="text-gray-600 mb-2"><strong>Mentor:</strong> Bhargava Sai Reddy Vanga</p>
+      <p class="text-gray-600"><strong>Coordinator:</strong> Pranathi</p>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="bg-gray-100 py-20">
+    <div class="max-w-5xl mx-auto text-center px-6">
+      <h2 class="text-4xl font-bold mb-12 text-gray-800">Our Team</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-12 justify-items-center">
+
+        <div class="flex flex-col items-center">
+          <div class="w-32 h-32 rounded-full bg-blue-500 flex items-center justify-center text-white text-5xl font-bold shadow-lg">B</div>
+          <h3 class="mt-4 text-lg font-semibold text-gray-800">Bhimavarapu Gagana Harshitha</h3>
+          <p class="text-gray-600 text-sm mt-1">Team Member</p>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <div class="w-32 h-32 rounded-full bg-blue-500 flex items-center justify-center text-white text-5xl font-bold shadow-lg">B</div>
+          <h3 class="mt-4 text-lg font-semibold text-gray-800">Bhargava Sai Reddy Vanga</h3>
+          <p class="text-gray-600 text-sm mt-1">Mentor</p>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <div class="w-32 h-32 rounded-full bg-blue-500 flex items-center justify-center text-white text-5xl font-bold shadow-lg">P</div>
+          <h3 class="mt-4 text-lg font-semibold text-gray-800">Pranathi</h3>
+          <p class="text-gray-600 text-sm mt-1">Coordinator</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="bg-blue-600 text-white py-16">
+    <div class="max-w-3xl mx-auto text-center px-6">
+      <h2 class="text-3xl font-bold mb-4">Get in Touch</h2>
+      <p class="mb-6 text-gray-100">Reach out to learn more about our project or collaborate with our team.</p>
+      <p class="mb-2"><strong>Email:</strong> info@infosysspringboard.com</p>
+      <p class="mb-6"><strong>Phone:</strong> +91 XXXXX XXXXX</p>
+      <a href="{% url 'home' %}" class="inline-block bg-white text-blue-600 font-semibold px-6 py-3 rounded-full shadow hover:bg-gray-100 transition">
+        Return to Home
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-200 text-gray-600 py-6 text-center text-sm">
+    © 2025 Quiz App. All rights reserved.
+  </footer>
+
+</body>
+</html>

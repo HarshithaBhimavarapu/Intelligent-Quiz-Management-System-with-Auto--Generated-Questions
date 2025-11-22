@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Categories</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-purple-500 text-gray-800 flex flex-col min-h-screen font-[Poppins]">
+
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto px-6 py-12">
+    <h2 class="text-3xl italic text-center text-white mb-9 uppercase tracking-wide">
+      Choose a Category
+    </h2>
+
+    <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      {% for category in categories %}
+        <a href="{% url 'subcategory_page' category.id %}"
+           class="block bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transform hover:-translate-y-1 transition duration-300 text-center">
+          
+          <!-- Icon -->
+          <div class="flex justify-center mb-4">
+            {% if category.name|lower == "academic" %}
+              <i data-lucide="book-open" class="w-10 h-10 text-blue-600"></i>
+            {% elif category.name|lower == "general knowledge" %}
+              <i data-lucide="brain" class="w-10 h-10 text-green-600"></i>
+            {% elif category.name|lower == "coding languages" %}
+              <i data-lucide="code-2" class="w-10 h-10 text-orange-600"></i>
+            {% elif category.name|lower == "science" %}
+              <i data-lucide="flask-round" class="w-10 h-10 text-cyan-600"></i>
+            {% elif category.name|lower == "technology" %}
+              <i data-lucide="cpu" class="w-10 h-10 text-indigo-600"></i>
+            {% elif category.name|lower == "entertainment" %}
+              <i data-lucide="film" class="w-10 h-10 text-pink-600"></i>
+            {% elif category.name|lower == "sports" %}
+              <i data-lucide="trophy" class="w-10 h-10 text-yellow-600"></i>
+            {% elif category.name|lower == "mythological" %}
+              <i data-lucide="feather" class="w-10 h-10 text-red-600"></i>
+            {% elif category.name|lower == "animals" %}
+              <i data-lucide="paw-print" class="w-10 h-10 text-amber-600"></i>
+            {% elif category.name|lower == "festivals" %}
+              <i data-lucide="sparkles" class="w-10 h-10 text-fuchsia-600"></i>
+            {% elif category.name|lower == "astronomy" %}
+              <i data-lucide="moon-star" class="w-10 h-10 text-purple-600"></i>
+            {% else %}
+              <i data-lucide="circle" class="w-10 h-10 text-gray-500"></i>
+            {% endif %}
+          </div>
+
+          <!-- Text -->
+          <h3 class="text-lg font-semibold text-blue-700 mb-2">{{ category.name }}</h3>
+          <p class="text-gray-600 text-sm">{{ category.description }}</p>
+        </a>
+      {% empty %}
+        <p class="text-center text-gray-200 col-span-full">No categories available.</p>
+      {% endfor %}
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

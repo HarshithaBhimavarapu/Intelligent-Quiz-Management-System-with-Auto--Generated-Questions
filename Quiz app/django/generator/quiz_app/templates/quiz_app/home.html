@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-purple-600 text-white flex flex-col min-h-screen font-[Poppins]">
+
+  <!-- HEADER -->
+  <header class="fixed top-0 left-0 w-full bg-purple-400 text-white shadow-lg z-50">
+    <div class="flex justify-between items-center px-8 py-4">
+      <h1 class="text-2xl font-semibold tracking-wide flex items-center gap-2">
+        Quiz App
+      </h1>
+
+      <div class="flex items-center gap-4">
+        <a href="{% url 'profile' %}" class="transition-transform hover:scale-105">
+          {% if request.user.profile.avatar %}
+            <img src="{{ request.user.profile.avatar.url }}" alt="Profile"
+                 class="w-10 h-10 rounded-full border border-white/40 object-cover shadow-md">
+          {% else %}
+            <img src="{% static 'images/default.png' %}" alt="Default Profile"
+                 class="w-10 h-10 rounded-full border border-white/40 object-cover shadow-md">
+          {% endif %}
+        </a>
+
+        <form action="/logout/" method="POST">
+          {% csrf_token %}
+          <button type="submit"
+                  class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-red-300">
+            Logout
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex flex-col flex-grow items-center justify-center text-center px-6 mt-28">
+    <div class="bg-white shadow-2xl rounded-2xl p-10 max-w-xl w-full border border-gray-200 text-black">
+      <h2 class="text-3xl font-bold mb-2">
+        Welcome, {{ user.username }}
+      </h2>
+      <p class="mb-8 text-lg">
+        Test your knowledge and challenge yourself with fun quizzes!
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+
+        <!-- Start Quiz Button (Green) -->
+        <a href="{% url 'quiz_categories' %}"
+           class="group inline-flex items-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg
+                  hover:from-green-600 hover:to-emerald-700 transform hover:-translate-y-1 active:translate-y-0 active:scale-95 transition-all duration-200
+                  focus:outline-none focus:ring-4 focus:ring-green-300">
+          <span class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 group-hover:bg-white/25 transition-transform duration-200">
+            <svg class="w-5 h-5 transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 3.868a1 1 0 0 1 1.48-.874l13 7a1 1 0 0 1 0 1.724l-13 7A1 1 0 0 1 5 18.132V3.868z" fill="white"/>
+            </svg>
+          </span>
+          <span class="flex flex-col text-left leading-none">
+            <span class="text-base font-semibold">Start Quiz</span>
+            <small class="text-xs opacity-80">Choose a category & begin</small>
+          </span>
+        </a>
+
+        <!-- Dashboard Button (Purple) -->
+        <a href="{% url 'dashboard' %}"
+           class="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg
+                  hover:from-purple-600 hover:to-violet-700 transform hover:-translate-y-1 active:translate-y-0 active:scale-95 transition-all duration-200
+                  focus:outline-none focus:ring-4 focus:ring-purple-300">
+          <span class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 group-hover:bg-white/25 transition-transform duration-200">
+            <svg class="w-5 h-5 transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="8" height="8" rx="1.5" fill="white"/>
+              <rect x="13" y="3" width="8" height="8" rx="1.5" fill="white"/>
+              <rect x="3" y="13" width="8" height="8" rx="1.5" fill="white"/>
+              <rect x="13" y="13" width="8" height="8" rx="1.5" fill="white"/>
+            </svg>
+          </span>
+          <span class="flex flex-col text-left leading-none">
+            <span class="text-base font-semibold">Dashboard</span>
+            <small class="text-xs opacity-80">Your progress & history</small>
+          </span>
+        </a>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-white text-sm py-6 mt-10 bg-purple-600 border-t border-purple-700">
+    <a href="{% url 'about_us' %}" class="text-white hover:underline font-medium">About Us</a>
+    <p class="mt-1">© 2025 Quiz App | All Rights Reserved</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,349 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ subcategory.name }} Quiz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .quiz-card { box-shadow: 0 5px 15px rgba(0,0,0,0.05); scroll-margin-top: 80px; }
+    .option-item:hover { background-color: #eff6ff; border-color: #93c5fd; }
+    #progress-bar { height: 10px; border-radius: 9999px; transition: width 1s linear, background-color 0.5s; }
+    .active-nav { background-color: #2563eb; color: white; font-weight: 600; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-4 sm:p-8">
+
+  <!-- Page layout -->
+  <div class="flex flex-col lg:flex-row gap-6 w-full max-w-7xl mx-auto">
+
+    <!-- Left side question navigator + hint sidebar -->
+    <aside class="lg:w-1/5 bg-white p-4 rounded-xl shadow-md h-fit sticky top-4 self-start">
+      <h2 class="text-lg font-semibold text-blue-700 mb-3 text-center">Questions</h2>
+      <div class="grid grid-cols-5 sm:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-2 justify-center">
+        {% for question in questions %}
+          <button 
+            type="button" 
+            onclick="scrollToQuestion('{{ forloop.counter }}')" 
+            id="nav-{{ forloop.counter }}"
+            class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 text-sm text-gray-700 hover:bg-blue-500 hover:text-white transition">
+            {{ forloop.counter }}
+          </button>
+        {% endfor %}
+      </div>
+
+      <!-- Hint Sidebar -->
+      <div id="hint-sidebar" class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 hidden">
+        <h3 class="font-semibold text-blue-800 mb-2">Hint</h3>
+        <div id="hint-content" class="text-gray-700 text-sm">
+          Click 💡 Hint beside a question to view it here.
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main quiz section -->
+    <div class="flex-1">
+
+      <!-- Header -->
+      <header class="bg-white p-6 rounded-xl shadow-md mb-6 border-t-4 border-blue-600">
+        <p class="text-sm text-blue-600 font-semibold uppercase tracking-wider">{{ category.name }}</p>
+        <h1 class="text-3xl font-extrabold text-gray-900 mt-1">{{ subcategory.name }} Quiz</h1>
+        {% if error_message %}
+          <div class="mt-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
+            <p class="font-medium">{{ error_message }}</p>
+          </div>
+        {% else %}
+          <p class="text-gray-600 mt-2">Answer the following questions to test your knowledge.</p>
+        {% endif %}
+      </header>
+
+      
+
+      <!--  Timer  -->
+<div class="sticky top-0 z-50 bg-white shadow-md rounded-xl p-3 mb-6">
+  <div class="w-full bg-gray-200 rounded-full overflow-hidden h-3">
+    <div id="timer-bar" class="h-3 w-full rounded-full transition-all duration-500 ease-linear bg-green-500"></div>
+  </div>
+  <p id="timer-text" class="text-center text-lg font-semibold text-blue-700 mt-2">Time Left: 02:00</p>
+</div>
+
+
+      {% if questions %}
+      <form method="post" action="{% url 'submit_quiz' subcategory.id %}" class="space-y-6" id="quiz-form">
+        {% csrf_token %}
+        <input type="hidden" name="question_count" value="{{ question_count }}">
+
+        {% for question in questions %}
+        <div id="question-{{ forloop.counter }}" class="quiz-card bg-white p-6 rounded-xl border-l-4 border-blue-500">
+          <p class="text-sm text-gray-500 font-medium mb-1">
+            Question {{ forloop.counter }} of {{ question_count }}
+          </p>
+
+          <div class="mb-4">
+  <p class="text-lg font-semibold text-gray-800 mb-3">{{ question.text }}</p>
+  <div class="flex flex-wrap justify-end gap-3">
+    <button 
+      type="button"
+      class="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
+      data-question-id="{{ question.id }}"
+      data-question-number="{{ forloop.counter }}"
+      onclick="getHint(this)">
+      💡 Hint
+    </button>
+    <button 
+      type="button"
+      class="px-3 py-1 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition"
+      onclick="markForReview('{{ forloop.counter }}')">
+       Mark for Review
+    </button>
+  </div>
+</div>
+
+
+          <div class="space-y-3 mt-4">
+            <label class="flex items-start option-item bg-gray-50 p-3 rounded-lg cursor-pointer border border-gray-200">
+              <input type="radio" name="question_{{ forloop.counter }}" value="a" required>
+              <span class="ml-3 text-base font-medium text-gray-700">A. {{ question.option_a }}</span>
+            </label>
+            <label class="flex items-start option-item bg-gray-50 p-3 rounded-lg cursor-pointer border border-gray-200">
+              <input type="radio" name="question_{{ forloop.counter }}" value="b" required>
+              <span class="ml-3 text-base font-medium text-gray-700">B. {{ question.option_b }}</span>
+            </label>
+            <label class="flex items-start option-item bg-gray-50 p-3 rounded-lg cursor-pointer border border-gray-200">
+              <input type="radio" name="question_{{ forloop.counter }}" value="c" required>
+              <span class="ml-3 text-base font-medium text-gray-700">C. {{ question.option_c }}</span>
+            </label>
+            <label class="flex items-start option-item bg-gray-50 p-3 rounded-lg cursor-pointer border border-gray-200">
+              <input type="radio" name="question_{{ forloop.counter }}" value="d" required>
+              <span class="ml-3 text-base font-medium text-gray-700">D. {{ question.option_d }}</span>
+            </label>
+          </div>
+
+          <input type="hidden" name="question_id_{{ forloop.counter }}" value="{{ question.id }}">
+        </div>
+        {% endfor %}
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row justify-center gap-3 mt-6">
+          <button type="submit" name="action" value="submit"
+            class="w-full sm:w-1/4 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition transform hover:scale-105">
+            Submit
+          </button>
+
+          <button type="button" name="action" value="pause_quit"
+            class="w-full sm:w-1/4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition transform hover:scale-105"
+            onclick="submitWithoutRequired('pause_quit')">
+            Pause & Quit
+          </button>
+
+          <button type="button" name="action" value="abandon"
+            class="w-full sm:w-1/4 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow hover:bg-red-600 transition transform hover:scale-105"
+            onclick="submitWithoutRequired('abandon')">
+            Quit
+          </button>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+
+ //  Smooth Animated Timer & Progress Bar
+const questionCount = parseInt(document.querySelector('input[name="question_count"]').value);
+let totalTime = 120;
+
+if (questionCount <= 5) totalTime = 120;        // 2 mins
+else if (questionCount <= 10) totalTime = 300;  // 5 mins
+else if (questionCount <= 20) totalTime = 600;  // 10 mins
+else totalTime = 900;                           // 15 mins
+
+const timerText = document.getElementById("timer-text");
+const timerBar = document.getElementById("timer-bar");
+const initialTime = totalTime;
+
+function updateTimer() {
+  const minutes = Math.floor(totalTime / 60);
+  const seconds = totalTime % 60;
+  timerText.textContent = `Time Left: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+  const percent = totalTime / initialTime;
+  timerBar.style.width = (percent * 100) + "%";
+
+  // Smooth color transitions: Green → Yellow → Red
+  if (percent > 0.5) {
+    timerBar.style.backgroundColor = "#22c55e"; // Green
+  } else if (percent > 0.2) {
+    timerBar.style.backgroundColor = "#facc15"; // Yellow
+  } else {
+    timerBar.style.backgroundColor = "#ef4444"; // Red
+  }
+
+  if (totalTime <= 0) {
+    clearInterval(timerInterval);
+    alert("⏰ Time's up! Submitting your quiz...");
+    document.getElementById("quiz-form").submit();
+  }
+
+  totalTime--;
+}
+
+const timerInterval = setInterval(updateTimer, 1000);
+
+// Fix sticky scroll offset
+window.addEventListener('hashchange', () => window.scrollBy(0, -80));
+
+
+  // Scroll to specific question
+  function scrollToQuestion(num) {
+    num = parseInt(num);
+    const question = document.getElementById(`question-${num}`);
+    if (question) question.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const navBtn = document.getElementById(`nav-${num}`);
+if (navBtn) {
+  navBtn.dataset.visited = 'true';
+}
+
+
+    document.querySelectorAll('[id^="nav-"]').forEach(btn => btn.classList.remove('active-nav'));
+    const activeBtn = document.getElementById(`nav-${num}`);
+    if (activeBtn) activeBtn.classList.add('active-nav');
+  }
+  
+
+  // Highlight current question in navigator on scroll (preserve states)
+window.addEventListener('scroll', () => {
+  let current = null;
+  const allQuestions = document.querySelectorAll('[id^="question-"]');
+
+  allQuestions.forEach(q => {
+    const rect = q.getBoundingClientRect();
+    if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+      current = q.id.split('-')[1];
+    }
+  });
+
+  document.querySelectorAll('[id^="nav-"]').forEach(btn => {
+    const num = btn.id.split('-')[1];
+    const bg = btn.style.backgroundColor;
+
+    // Keep answered or marked as is
+    if (bg === 'rgb(34, 197, 94)' || bg === 'rgb(168, 85, 247)') return;
+
+    if (num === current) {
+      // Current question being viewed
+      btn.style.backgroundColor = '#3b82f6'; // Blue
+      btn.style.color = 'white';
+      btn.dataset.visited = 'true'; // mark as visited
+    } else {
+      // Visited but not answered
+      if (btn.dataset.visited === 'true') {
+        btn.style.backgroundColor = '#d1d5db'; // Gray for visited
+        btn.style.color = '#374151';
+      } else {
+        // Not visited yet
+        btn.style.backgroundColor = '#e5e7eb'; // Light gray
+        btn.style.color = '#374151';
+      }
+    }
+  });
+});
+
+
+  // Detect answer selection and color buttons
+  document.querySelectorAll('input[type="radio"]').forEach(input => {
+    input.addEventListener('change', () => {
+      const name = input.name; 
+      const num = name.split('_')[1];
+      const navBtn = document.getElementById(`nav-${num}`);
+      if (navBtn) {
+        navBtn.style.backgroundColor = '#22c55e';
+        navBtn.style.color = 'white';
+      }
+    });
+  });
+
+  // Allow deselecting radio buttons on second click
+document.querySelectorAll('input[type="radio"]').forEach(radio => {
+  radio.addEventListener('click', function(e) {
+    if (this.previousChecked) {
+      this.checked = false;
+      this.previousChecked = false;
+
+      // Reset color to gray if deselected
+      const num = this.name.split('_')[1];
+      const navBtn = document.getElementById(`nav-${num}`);
+      if (navBtn && navBtn.style.backgroundColor !== 'rgb(168, 85, 247)') { // don’t override purple
+        navBtn.style.backgroundColor = '#e5e7eb';
+        navBtn.style.color = '#374151';
+      }
+    } else {
+      // Normal select
+      document.querySelectorAll(`input[name="${this.name}"]`).forEach(r => r.previousChecked = false);
+      this.previousChecked = true;
+    }
+  });
+});
+
+
+  // Fetch AI-generated hint
+  async function getHint(btn) {
+    const questionId = btn.getAttribute('data-question-id');
+    const questionNumber = btn.getAttribute('data-question-number');
+    const hintSidebar = document.getElementById("hint-sidebar");
+    const hintContent = document.getElementById("hint-content");
+
+    hintSidebar.classList.remove("hidden");
+    hintContent.innerHTML = `<em>Generating hint for question ${questionNumber}...</em>`;
+
+    try {
+      const response = await fetch(`/get_hint/${questionId}/`);
+      if (!response.ok) throw new Error("Error fetching hint");
+      const data = await response.json();
+      hintContent.innerHTML = `
+        <div class="p-2 border-t border-blue-200 mt-2">
+          <p class="font-semibold text-blue-800">Hint for Question ${questionNumber}:</p>
+          <p class="text-gray-700 mt-1">${data.hint}</p>
+        </div>
+      `;
+    } catch (error) {
+      hintContent.innerHTML = `<span class="text-red-600">Error loading hint.</span>`;
+    }
+  }
+  
+ // Toggle Mark for Review (Purple <-> Gray)
+function markForReview(num) {
+  const navBtn = document.getElementById(`nav-${num}`);
+  if (navBtn) {
+    const currentColor = navBtn.style.backgroundColor;
+    if (currentColor === 'rgb(168, 85, 247)') { 
+      // Already marked (purple) -> Unmark
+      navBtn.style.backgroundColor = '#e5e7eb'; // Gray
+      navBtn.style.color = '#374151';
+    } else {
+      // Mark for review
+      navBtn.style.backgroundColor = '#a855f7'; // Purple
+      navBtn.style.color = 'white';
+    }
+  }
+}
+
+
+  // Submit without required validation
+  function submitWithoutRequired(actionValue) {
+    const form = document.getElementById("quiz-form");
+    form.querySelectorAll('input[required]').forEach(input => input.removeAttribute('required'));
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'action';
+    actionInput.value = actionValue;
+    form.appendChild(actionInput);
+    form.submit();
+  }
+  </script>
+
+</body>
+</html>

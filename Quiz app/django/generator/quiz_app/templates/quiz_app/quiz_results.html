@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ subcategory.name }} - Results</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f7f7; }
+    .quiz-card { box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+
+  <div class="w-full max-w-4xl">
+    <header class="bg-white p-6 rounded-xl shadow-lg mb-8 text-center">
+      <h1 class="text-4xl font-extrabold text-gray-900 mt-1">Quiz Results: {{ subcategory.name }}</h1>
+      <p class="text-xl mt-2 text-blue-600 font-semibold">Score: {{ score }}</p>
+    </header>
+
+    {% for result in results %}
+    <div class="quiz-card bg-white p-6 rounded-xl border-t-4 {% if result.correct %}border-green-500{% else %}border-red-500{% endif %} mb-6">
+      <p class="text-lg font-bold">{{ forloop.counter }}. {{ result.question }}</p>
+      <ul class="mt-2 space-y-2">
+        <li class="{% if result.correct_answer_key == 'a' %}font-bold text-green-700{% endif %}">A. {{ result.options.a }}</li>
+        <li class="{% if result.correct_answer_key == 'b' %}font-bold text-green-700{% endif %}">B. {{ result.options.b }}</li>
+        <li class="{% if result.correct_answer_key == 'c' %}font-bold text-green-700{% endif %}">C. {{ result.options.c }}</li>
+        <li class="{% if result.correct_answer_key == 'd' %}font-bold text-green-700{% endif %}">D. {{ result.options.d }}</li>
+      </ul>
+
+      {% if not result.correct %}
+        <p class="mt-2 text-red-600"><strong>Your Answer:</strong> {{ result.your_answer_text }}</p>
+      {% endif %}
+
+      <p class="mt-2 text-green-700">
+        <strong>Correct Answer:</strong> {{ result.correct_answer_key|upper }} - {{ result.correct_answer_text }}
+      </p>
+
+      {% if result.explanation %}
+      <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-lg">
+        <p class="text-gray-800"><strong>Explanation:</strong> {{ result.explanation }}</p>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <!-- Action Buttons Section -->
+    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-10">
+      <!-- Dashboard Button -->
+      <a href="{% url 'dashboard' %}"
+         class="px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-105 text-center">
+        Go to Dashboard
+      </a>
+
+      <!-- Start New Quiz Button -->
+      <a href="{% url 'quiz_categories' %}"
+         class="px-6 py-3 bg-green-600 text-white font-bold rounded-full shadow-lg hover:bg-green-700 transition transform hover:scale-105 text-center">
+        Start New Quiz
+      </a>
+
+      <!-- Return to Home Button -->
+      <a href="{% url 'home' %}" 
+         class="px-6 py-3 bg-fuchsia-600 text-white font-bold rounded-full shadow-lg hover:bg-fuchsia-700 transition transform hover:scale-105 text-center">
+        Return to Home
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

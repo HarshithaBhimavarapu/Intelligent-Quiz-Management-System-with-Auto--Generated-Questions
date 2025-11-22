@@ -1,0 +1,342 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Modern Quiz Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .progress-bar-fill { transition: width 1.5s ease-out; }
+  .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+  .circle-chart { position: relative; display: inline-block; width: 100px; height: 100px; }
+  .circle-chart svg { transform: rotate(-90deg); }
+  .circle-chart circle { fill: none; stroke-width: 10; stroke-linecap: round; }
+  .circle-bg { stroke: #eee; }
+  .circle-progress { stroke: #3b82f6; stroke-dasharray: 2 * 3.1416 * 45; stroke-dashoffset: 2 * 3.1416 * 45; transition: stroke-dashoffset 1.5s ease-out; }
+  .circle-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; font-size: 1rem; }
+  .avatar-tooltip { position: relative; }
+  .avatar-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+  .tooltip-text { visibility: hidden; opacity: 0; transition: opacity 0.3s; background-color: #1f2937; color: white; text-align: center; padding: 4px 8px; border-radius: 6px; position: absolute; z-index: 10; bottom: 120%; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 0.75rem; }
+
+  @keyframes pulseSlow { 0%,100%{transform:scale(1);}50%{transform:scale(1.15);} }
+  .animate-pulse-slow { animation: pulseSlow 2s ease-in-out infinite; }
+
+  @keyframes bounceSlow { 0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);} }
+  .animate-bounce-slow { animation: bounceSlow 3s ease-in-out infinite; }
+
+  @keyframes fadeInUp { 0%{opacity:0;transform:translateY(10px);}100%{opacity:1;transform:translateY(0);} }
+  .animate-fade-in { animation: fadeInUp 0.6s ease forwards; }
+
+  .badge-trophy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: transform 0.3s;
+  }
+  .badge-trophy:hover { transform: scale(1.1); }
+  .achieved-trophy { font-size: 2.5rem !important; padding: 1rem 1.5rem; }
+  .small-symbol { font-size: 2rem; }
+  .card-title { font-size: 1.25rem; }
+  .top-section { gap: 2rem; margin-bottom: 2rem; }
+
+  /* Streak milestone visual bar */
+  .milestone-bar { position: relative; background: #eee; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 0.5rem; }
+  .milestone-progress { background: linear-gradient(to right, #facc15, #34d399, #3b82f6); height: 12px; border-radius: 6px; transition: width 1.5s; }
+  .milestone-point { position: absolute; top: -4px; width: 12px; height: 20px; background: #fff; border: 2px solid #999; border-radius: 6px; text-align: center; font-size: 0.7rem; line-height: 16px; }
+</style>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+
+<!-- Navbar -->
+<nav class="flex justify-between items-center mb-8">
+  <h1 class="text-4xl font-bold text-blue-600">Modern Quiz Dashboard</h1>
+  <div class="space-x-4">
+    <a href="{% url 'home' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow">Home</a>
+    <a href="{% url 'quiz_categories' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow">Start Quiz</a>
+  </div>
+</nav>
+
+<!-- Streak & Trophies -->
+<div class="grid grid-cols-1 md:grid-cols-2 top-section">
+
+  <!-- Daily Streak -->
+  <div class="relative bg-white rounded-2xl p-6 shadow-md text-center overflow-hidden group">
+    <div class="text-4xl mb-2 animate-bounce-slow small-symbol">🔥</div>
+    <h3 class="card-title font-semibold text-gray-800">Daily Streak</h3>
+    <p id="daily-streak" class="text-5xl font-extrabold text-orange-600 mt-2 animate-pulse-slow"></p>
+    <p class="text-sm text-gray-700 mt-1" id="next-trophy">Next trophy: Fast Learner</p>
+
+    <!-- Milestone progress -->
+    <div class="milestone-bar">
+      <div id="streak-progress" class="milestone-progress" style="width:0%"></div>
+      
+    </div>
+  </div>
+
+  <!-- Trophies -->
+  <div class="relative bg-white rounded-2xl p-6 shadow-md text-center overflow-hidden group">
+    <div class="text-4xl mb-2 small-symbol">🏅</div>
+    <h3 class="card-title font-semibold text-gray-800">Your Trophies</h3>
+    <div id="badges-container" class="mt-4 flex flex-wrap justify-center gap-4"></div>
+  </div>
+</div>
+
+<!-- Stats Circles -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white shadow-md rounded-xl p-6 text-center">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Score Today</h2>
+    <div class="circle-chart">
+      <svg viewBox="0 0 100 100">
+        <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
+        <circle class="circle-progress" id="today-score-circle" cx="50" cy="50" r="45"></circle>
+      </svg>
+      <div class="circle-text" id="today-score-text">0%</div>
+    </div>
+  </div>
+  <div class="bg-white shadow-md rounded-xl p-6 text-center">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Highest Score</h2>
+    <div class="circle-chart">
+      <svg viewBox="0 0 100 100">
+        <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
+        <circle class="circle-progress" id="highest-score-circle" cx="50" cy="50" r="45"></circle>
+      </svg>
+      <div class="circle-text" id="highest-score-text">0%</div>
+    </div>
+  </div>
+  <div class="bg-white shadow-md rounded-xl p-6 text-center">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Average Score</h2>
+    <div class="circle-chart">
+      <svg viewBox="0 0 100 100">
+        <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
+        <circle class="circle-progress" id="average-score-circle" cx="50" cy="50" r="45"></circle>
+      </svg>
+      <div class="circle-text" id="average-score-text">0%</div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
+  <div class="stat-card bg-white shadow-md rounded-xl p-6 text-center border-l-4 border-green-500">
+    <h2 class="font-semibold text-gray-600">Completed</h2>
+    <p id="completed" class="text-3xl font-bold text-gray-900">0</p>
+  </div>
+  <div class="stat-card bg-white shadow-md rounded-xl p-6 text-center border-l-4 border-yellow-500">
+    <h2 class="font-semibold text-gray-600">In Progress</h2>
+    <p id="in-progress" class="text-3xl font-bold text-gray-900">0</p>
+  </div>
+  <div class="stat-card bg-white shadow-md rounded-xl p-6 text-center border-l-4 border-red-500">
+    <h2 class="font-semibold text-gray-600">Abandoned</h2>
+    <p id="abandoned" class="text-3xl font-bold text-gray-900">0</p>
+  </div>
+  <div class="stat-card bg-white shadow-md rounded-xl p-6 text-center border-l-4 border-blue-500">
+    <h2 class="font-semibold text-gray-600">Leaderboard Avg</h2>
+    <p id="average-score-leader" class="text-3xl font-bold text-gray-900">0%</p>
+  </div>
+</div>
+
+<!-- Leaderboards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+  <!-- Streak Leaderboard -->
+  <div class="bg-white shadow-md rounded-xl p-6">
+    <h2 class="text-xl font-semibold text-gray-700 mb-4">Streak Leaderboard</h2>
+    <div id="streak-leaderboard-container" class="space-y-4">
+      <p class="text-gray-500 text-center">Loading streak leaderboard...</p>
+    </div>
+  </div>
+
+  <!-- Quiz Leaderboard -->
+  <div class="bg-white shadow-md rounded-xl p-6">
+    <h2 class="text-xl font-semibold text-gray-700 mb-4">Quiz Leaderboard</h2>
+    <div id="leaderboard-container" class="space-y-4">
+      <p class="text-gray-500 text-center">Loading leaderboard...</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Quiz History Table -->
+  <div class="bg-white shadow-md rounded-xl p-6 mb-8">
+    <h2 class="text-xl font-semibold text-gray-700 mb-4">Quiz History</h2>
+    <table class="w-full text-left border border-gray-200 rounded-lg overflow-hidden">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-2 border">Subcategory</th>
+          <th class="px-4 py-2 border">Score</th>
+          <th class="px-4 py-2 border">Status</th>
+          <th class="px-4 py-2 border">Date & Time</th>
+          <th class="px-4 py-2 border text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for attempt in history %}
+        <tr class="history-row hover:bg-gray-50">
+          <td class="border px-4 py-2">{{ attempt.subcategory.name }}</td>
+          <td class="border px-4 py-2">{{ attempt.score }}</td>
+          <td class="border px-4 py-2">{{ attempt.status }}</td>
+          <td class="border px-4 py-2">{{ attempt.attempted_at|date:"d M Y H:i" }}</td>
+          <td class="border px-4 py-2 text-center">
+            {% if attempt.status == "completed" %}
+              <a href="{% url 'view_attempt' attempt.id %}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm">View Attempt</a>
+            {% elif attempt.status == "in_progress" %}
+              <a href="{% url 'resume_quiz' attempt.id %}" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm">Resume</a>
+            {% else %}
+              <span class="text-red-500 font-semibold">Abandoned</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center py-4 text-gray-500">No history yet</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+<script>
+fetch("/dashboard-data/")
+.then(res=>res.json())
+.then(data=>{
+  // --- Stats ---
+  document.getElementById("completed").textContent = data.stats.completed;
+  document.getElementById("in-progress").textContent = data.stats.in_progress;
+  document.getElementById("abandoned").textContent = data.stats.abandoned;
+  document.getElementById("average-score-leader").textContent = data.stats.average_score.toFixed(2)+"%";
+
+  // --- Streak ---
+  const streak = data.stats.daily_streak || 0;
+  const streakEl = document.getElementById("daily-streak");
+  streakEl.textContent = streak;
+  streakEl.classList.remove("animate-pulse-slow"); void streakEl.offsetWidth; streakEl.classList.add("animate-pulse-slow");
+
+  // Milestone bar
+  const progressBar = document.getElementById("streak-progress");
+  const milestones = [3,7,10];
+  const nextTrophy = milestones.find(m=>streak<m) || 10;
+  progressBar.style.width = Math.min((streak/nextTrophy)*100,100)+"%";
+
+  const badgesContainer = document.getElementById("badges-container");
+  badgesContainer.innerHTML="";
+  const trophies = [];
+  let nextTrophyText="";
+  if(streak>=10){ trophies.push({emoji:"🏆",label:"Quiz Legend",color:"text-yellow-500 achieved-trophy"}); nextTrophyText="Keep going to maintain Quiz Legend!"; }
+  else if(streak>=7){ trophies.push({emoji:"🥈",label:"Quiz Master",color:"text-gray-400"}); nextTrophyText="Streak 10 days to earn Quiz Legend!"; }
+  else if(streak>=3){ trophies.push({emoji:"🥉",label:"Fast Learner",color:"text-orange-500"}); nextTrophyText="Streak 7 days to earn Quiz Master!"; }
+  else{ nextTrophyText="Streak 3 days to earn Fast Learner!"; }
+  document.getElementById("next-trophy").textContent=nextTrophyText;
+  trophies.forEach((t,i)=>{
+    const span=document.createElement("span");
+    span.className=`animate-fade-in badge-trophy ${t.color}`;
+    span.style.animationDelay=`${i*0.15}s`;
+    span.textContent=`${t.emoji} ${t.label}`;
+    badgesContainer.appendChild(span);
+  });
+
+  // --- Circle Charts ---
+  function setCircle(idCircle,idText,percent){
+    const circle=document.getElementById(idCircle);
+    const radius=45;
+    const circumference=2*Math.PI*radius;
+    const offset=circumference-(percent/100)*circumference;
+    circle.style.strokeDasharray=circumference;
+    circle.style.strokeDashoffset=offset;
+    document.getElementById(idText).textContent=percent.toFixed(1)+"%";
+  }
+  setCircle("today-score-circle","today-score-text",data.history.length?data.history[0].score:0);
+  setCircle("highest-score-circle","highest-score-text",data.history.length?Math.max(...data.history.map(a=>a.score)):0);
+  setCircle("average-score-circle","average-score-text",data.stats.average_score);
+
+  // --- Quiz Leaderboard ---
+  const quizContainer=document.getElementById("leaderboard-container");
+  quizContainer.innerHTML="";
+  if(data.leaderboard.length===0){ quizContainer.innerHTML="<p class='text-center text-gray-500'>No data yet</p>"; }
+  else{
+    data.leaderboard.sort((a,b)=>b.avg_score-a.avg_score);
+    data.leaderboard.forEach((item,index)=>{
+      const medal=index===0?"🥇":index===1?"🥈":index===2?"🥉":""; 
+      const scorePercent=Math.min(item.avg_score,100);
+      const avatarUrl=item.avatar_url||'/static/avatars/default.png';
+      const barId=`progress-bar-${index}`;
+      quizContainer.innerHTML+=`<div class="flex items-center space-x-4">
+      <span class="text-gray-700 w-6 font-semibold">${index+1}</span>
+      <div class="avatar-tooltip relative">
+        <img src="${avatarUrl}" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200">
+        <span class="tooltip-text">${item.total_attempts||0} attempts</span>
+      </div>
+      <div class="flex-1">
+        <div class="flex justify-between mb-1"><span class="font-semibold text-gray-700">${medal} ${item.user__username}</span><span class="font-semibold text-gray-700">${scorePercent.toFixed(2)}%</span></div>
+        <div class="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
+          <div id="${barId}" class="bg-gradient-to-r from-yellow-400 via-green-400 to-blue-500 h-4 rounded-full progress-bar-fill" style="width:0%;"></div>
+        </div>
+      </div>
+      </div>`;
+      setTimeout(()=>document.getElementById(barId).style.width=scorePercent+"%",100);
+    });
+  }
+
+  // --- Streak Leaderboard with progress ---
+  const streakContainer = document.getElementById("streak-leaderboard-container");
+  streakContainer.innerHTML = "";
+  if(!data.streak_leaderboard || data.streak_leaderboard.length === 0) {
+    streakContainer.innerHTML = "<p class='text-center text-gray-500'>No streak data yet</p>";
+  } else {
+    data.streak_leaderboard.sort((a,b) => b.streak - a.streak);
+    const milestones = [3,7,10];
+    data.streak_leaderboard.forEach((user,index)=>{
+      const medal = index===0?"🥇":index===1?"🥈":index===2?"🥉":"";
+      const nextMilestone = milestones.find(m=>user.streak<m) || milestones[milestones.length-1];
+      const progressPercent = Math.min((user.streak/nextMilestone)*100,100);
+      
+      // Determine color based on milestone
+      let progressColor="from-yellow-400 via-green-400 to-blue-500";
+      if(user.streak<3) progressColor="from-yellow-400 via-yellow-300 to-yellow-500"; 
+      else if(user.streak<7) progressColor="from-gray-400 via-gray-300 to-gray-500"; 
+      else progressColor="from-blue-400 via-blue-300 to-blue-600";
+
+      streakContainer.innerHTML += `
+        <div class="flex flex-col space-y-1 bg-gray-50 p-2 rounded-lg shadow-sm hover:bg-gray-100 transition">
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-700 w-6 font-semibold">${index+1}</span>
+            <div class="avatar-tooltip relative">
+              <img src="${user.avatar_url || '/static/avatars/default.png'}" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200">
+              <span class="tooltip-text">${user.streak} days</span>
+            </div>
+            <div class="flex-1">
+              <span class="font-semibold text-gray-700">${medal} ${user.username}</span>
+            </div>
+            <span class="font-semibold text-gray-700">${user.streak}d</span>
+          </div>
+          <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden mt-1">
+            <div class="h-2 rounded-full bg-gradient-to-r ${progressColor}" style="width:${progressPercent}%; transition: width 1s;"></div>
+          </div>
+        </div>`;
+    });
+  }
+
+  // --- Quiz History ---
+  const historyTable=document.getElementById("history-table");
+  historyTable.innerHTML="";
+  if(data.history.length===0){ historyTable.innerHTML=`<tr><td colspan="5" class="text-center py-4 text-gray-500">No history yet</td></tr>`; }
+  else{
+    data.history.forEach(h=>{
+      let actions="";
+      if(h.status==="completed") actions=`<a href="/view_attempt/${h.id}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm">View Attempt</a>`;
+      else if(h.status==="in_progress") actions=`<a href="/resume_quiz/${h.id}" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm">Resume</a>`;
+      else actions=`<span class="text-red-500 font-semibold">Abandoned</span>`;
+      historyTable.innerHTML+=`<tr class="hover:bg-gray-50">
+      <td class="border px-4 py-2">${h.subcategory__name}</td>
+      <td class="border px-4 py-2">${h.score}</td>
+      <td class="border px-4 py-2">${h.status}</td>
+      <td class="border px-4 py-2">${new Date(h.attempted_at).toLocaleString()}</td>
+      <td class="border px-4 py-2 text-center">${actions}</td>
+      </tr>`;
+    });
+  }
+});
+</script>
+</body>
+</html>

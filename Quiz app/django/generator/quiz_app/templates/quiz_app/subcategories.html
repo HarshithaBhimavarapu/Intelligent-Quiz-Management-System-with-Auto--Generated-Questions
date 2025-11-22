@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ category.name }} - Subcategories</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+
+<body class="min-h-screen bg-purple-500 flex flex-col items-center justify-center text-gray-800">
+
+  <div class="w-11/12 max-w-6xl">
+    <h1 class="text-center text-3xl font-bold text-white mb-12">
+      {{ category.name }} Subcategories
+    </h1>
+
+    <!-- Subcategory Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {% for sub in subcategories %}
+      <div class="bg-white rounded-2xl shadow-md p-6 text-center border border-transparent 
+                  hover:border-green-500 hover:shadow-lg transition transform hover:-translate-y-2 
+                  cursor-pointer card"
+           data-category-id="{{ category.id }}"
+           data-subcategory-id="{{ sub.id }}">
+
+       <!-- ICON SECTION -->
+        <div class="flex justify-center mb-4">
+          {% if "ai" in sub.name|lower %}
+            <i data-lucide="cpu" class="w-10 h-10 text-indigo-600"></i>
+          {% elif "computer" in sub.name|lower or "technology" in sub.name|lower %}
+            <i data-lucide="monitor" class="w-10 h-10 text-blue-600"></i>
+          {% elif "html" in sub.name|lower or "java" in sub.name|lower or "python" in sub.name|lower or "c++" in sub.name|lower or "c " in sub.name|lower %}
+            <i data-lucide="code-2" class="w-10 h-10 text-orange-600"></i>
+          {% elif "history" in sub.name|lower %}
+            <i data-lucide="book-open" class="w-10 h-10 text-yellow-600"></i>
+          {% elif "india" in sub.name|lower %}
+            <i data-lucide="map-pin" class="w-10 h-10 text-green-600"></i>
+          {% elif "current" in sub.name|lower %}
+            <i data-lucide="newspaper" class="w-10 h-10 text-cyan-600"></i>
+          {% elif "geography" in sub.name|lower %}
+            <i data-lucide="globe" class="w-10 h-10 text-emerald-600"></i>
+          {% elif "physics" in sub.name|lower %}
+            <i data-lucide="atom" class="w-10 h-10 text-purple-600"></i>
+          {% elif "chemistry" in sub.name|lower %}
+            <i data-lucide="flask-round" class="w-10 h-10 text-blue-600"></i>
+          {% elif "math" in sub.name|lower %}
+            <i data-lucide="calculator" class="w-10 h-10 text-pink-600"></i>
+          {% elif "zoology" in sub.name|lower or "biology" in sub.name|lower or "botany" in sub.name|lower %}
+            <i data-lucide="dna" class="w-10 h-10 text-green-600"></i>
+          {% elif "meteorology" in sub.name|lower or "geology" in sub.name|lower or "oceanography" in sub.name|lower or "environment" in sub.name|lower %}
+            <i data-lucide="cloud-sun" class="w-10 h-10 text-sky-600"></i>
+          {% elif "robotics" in sub.name|lower or "biotechnology" in sub.name|lower %}
+            <i data-lucide="settings" class="w-10 h-10 text-indigo-600"></i>
+           {% elif "sports" in sub.name|lower or "cricket" in sub.name|lower or "football" in sub.name|lower or "tennis" in sub.name|lower %}
+            <i data-lucide="trophy" class="w-10 h-10 text-green-600"></i>
+          {% elif "bollywood" in sub.name|lower or "hollywood" in sub.name|lower or "tollywood" in sub.name|lower or "movies" in sub.name|lower or "series" in sub.name|lower or "shows" in sub.name|lower or "heroes" in sub.name|lower or "heroines" in sub.name|lower %}
+            <i data-lucide="film" class="w-10 h-10 text-pink-600"></i>
+          {% elif "singers" in sub.name|lower %}
+            <i data-lucide="mic" class="w-10 h-10 text-fuchsia-600"></i>
+          {% elif "ramayana" in sub.name|lower or "mahabharat" in sub.name|lower or "quran" in sub.name|lower or "bible" in sub.name|lower or "purana" in sub.name|lower or "gita" in sub.name|lower or "devi bhagavatam" in sub.name|lower %}
+            <i data-lucide="feather" class="w-10 h-10 text-red-600"></i>
+          {% elif "festival" in sub.name|lower or "diwali" in sub.name|lower or "christmas" in sub.name|lower or "holi" in sub.name|lower or "easter" in sub.name|lower or "ganesh" in sub.name|lower or "eid" in sub.name|lower or "onam" in sub.name|lower or "sankranti" in sub.name|lower or "dusshera" in sub.name|lower %}
+            <i data-lucide="sparkles" class="w-10 h-10 text-yellow-500"></i>
+          {% elif "animal" in sub.name|lower or "birds" in sub.name|lower or "domestic" in sub.name|lower or "aquatic" in sub.name|lower %}
+            <i data-lucide="paw-print" class="w-10 h-10 text-amber-600"></i>
+          {% elif "astronomy" in sub.name|lower or "astrophysics" in sub.name|lower or "cosmology" in sub.name|lower or "planetary" in sub.name|lower %}
+            <i data-lucide="moon-star" class="w-10 h-10 text-purple-600"></i>
+          {% elif "english" in sub.name|lower or "telugu" in sub.name|lower or "hindi" in sub.name|lower %}
+            <i data-lucide="type" class="w-10 h-10 text-blue-600"></i>
+          {% else %}
+          
+            <i data-lucide="circle" class="w-10 h-10 text-gray-400"></i>
+          {% endif %}
+        </div>
+
+        <!-- Subcategory Name -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ sub.name }}</h3>
+        <p class="text-sm text-gray-600">{{ sub.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+
+  <!-- Floating Action Panel -->
+  <div id="actionPanel" class="hidden fixed bottom-8 left-1/2 transform -translate-x-1/2 
+                              bg-white shadow-xl px-6 py-4 rounded-xl border border-gray-200 
+                              flex flex-wrap items-center justify-center gap-3 animate-fade-in">
+
+    <!-- Difficulty -->
+    <select id="difficulty" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+
+    <!-- Question Count -->
+    <select id="questionCount" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500">
+      <option value="5">5 Questions</option>
+      <option value="10">10 Questions</option>
+      <option value="20">20 Questions</option>
+    </select>
+
+    <!--  Green Start Quiz Button -->
+    <a id="startBtn"
+       class="group inline-flex items-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg
+              hover:from-green-600 hover:to-emerald-700 transform hover:-translate-y-1 active:translate-y-0 active:scale-95 transition-all duration-200
+              focus:outline-none focus:ring-4 focus:ring-green-300 cursor-pointer">
+      <span class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 group-hover:bg-white/25 transition-transform duration-200">
+        <svg class="w-5 h-5 transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 3.868a1 1 0 0 1 1.48-.874l13 7a1 1 0 0 1 0 1.724l-13 7A1 1 0 0 1 5 18.132V3.868z" fill="white"/>
+        </svg>
+      </span>
+      <span class="flex flex-col text-left leading-none">
+        <span class="text-base font-semibold">Start Quiz</span>
+      </span>
+    </a>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const cards = document.querySelectorAll('.card');
+    const actionPanel = document.getElementById('actionPanel');
+    const startBtn = document.getElementById('startBtn');
+    const questionCountSelect = document.getElementById('questionCount');
+    const difficultySelect = document.getElementById('difficulty');
+
+    let selectedCategoryId = null;
+    let selectedSubcategoryId = null;
+
+    // Card click behavior — green highlight
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('ring-4', 'ring-green-500'));
+        card.classList.add('ring-4', 'ring-green-500');
+        selectedCategoryId = card.dataset.categoryId;
+        selectedSubcategoryId = card.dataset.subcategoryId;
+        actionPanel.classList.remove('hidden');
+      });
+    });
+
+    // Start quiz navigation
+    startBtn.addEventListener('click', () => {
+      if (selectedCategoryId && selectedSubcategoryId) {
+        const selectedDifficulty = difficultySelect.value;
+        const selectedQuestionCount = questionCountSelect.value;
+        window.location.href = `/categories/${selectedCategoryId}/subcategories/${selectedSubcategoryId}/quiz/${selectedDifficulty}/${selectedQuestionCount}/`;
+      } else {
+        alert("Please select a subcategory first!");
+      }
+    });
+  </script>
+
+</body>
+</html>

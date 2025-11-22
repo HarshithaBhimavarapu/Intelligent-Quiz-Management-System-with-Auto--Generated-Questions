@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Quiz App</title>
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Quiz App!</h1>
+        <p>Test your knowledge and challenge yourself.</p>
+    </header>
+
+    <main>
+        {% if user.is_authenticated %}
+            <h2>Hello, {{ user.email }}</h2>
+            <p>You are logged in. Go to the quiz dashboard to start a quiz.</p>
+            <a href="{% url 'quiz_dashboard' %}">Go to Dashboard</a>
+            <br>
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <h2>Get Started</h2>
+            <p>Join our community to start playing quizzes.</p>
+            <a href="{% url 'login' %}">Log In</a>
+            <br>
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Quiz App</p>
+    </footer>
+</body>
+</html>

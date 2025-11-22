@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth Form</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #5eb9d7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .auth-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      width: 340px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      width: 50%;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      border-bottom: 2px solid transparent;
+      transition: 0.3s;
+    }
+
+    .tab.active {
+      color: #009688;
+      border-bottom: 2px solid #009688;
+    }
+
+    .form {
+      display: none;
+    }
+
+    .form.active {
+      display: block;
+    }
+
+    .input-box {
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 10px;
+      padding-left: 35px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .input-box i {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      color: #555;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: #00aaff;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #008ecc;
+    }
+  </style>
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="auth-box">
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" id="login-tab">Login</div>
+      <div class="tab" id="register-tab">Register</div>
+    </div>
+
+    <!-- Login Form -->
+    <form class="form active" id="login-form">
+      <div class="input-box">
+        <i class="fa fa-envelope"></i>
+        <input type="email" placeholder="Email.." required>
+      </div>
+      <div class="input-box">
+        <i class="fa fa-lock"></i>
+        <input type="password" placeholder="Password.." required>
+      </div>
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <!-- Register Form -->
+    <form class="form" id="register-form">
+      <div class="input-box">
+        <i class="fa fa-user"></i>
+        <input type="text" placeholder="Username.." required>
+      </div>
+      <div class="input-box">
+        <i class="fa fa-envelope"></i>
+        <input type="email" placeholder="Email.." required>
+      </div>
+      <div class="input-box">
+        <i class="fa fa-lock"></i>
+        <input type="password" placeholder="Enter Password.." required>
+      </div>
+      <div class="input-box">
+        <i class="fa fa-lock"></i>
+        <input type="password" placeholder="Re-enter Password.." required>
+      </div>
+      <button type="submit" class="btn">Register</button>
+    </form>
+  </div>
+
+  <script>
+    const loginTab = document.getElementById("login-tab");
+    const registerTab = document.getElementById("register-tab");
+    const loginForm = document.getElementById("login-form");
+    const registerForm = document.getElementById("register-form");
+
+    loginTab.addEventListener("click", () => {
+      loginTab.classList.add("active");
+      registerTab.classList.remove("active");
+      loginForm.classList.add("active");
+      registerForm.classList.remove("active");
+    });
+
+    registerTab.addEventListener("click", () => {
+      registerTab.classList.add("active");
+      loginTab.classList.remove("active");
+      registerForm.classList.add("active");
+      loginForm.classList.remove("active");
+    });
+  </script>
+</body>
+</html>
